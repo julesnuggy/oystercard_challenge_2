@@ -16,12 +16,6 @@ class Oystercard
     @balance += amount
   end
 
-  def deduct(fare_amount)
-    journey = Journey.new
-    journey.fare = fare_amount
-    @balance -= journey.fare
-  end
-
   def touch_in
     raise "Sorry, not enough credit in balance (£#{@balance})" if @balance < @minimum_balance
     @card_status = :in_use if @card_status == :not_in_use
@@ -29,10 +23,18 @@ class Oystercard
 
   def touch_out
     @card_status = :not_in_use if @card_status == :in_use
+    deduct(@minimum_balance)
   end
 
   def in_journey?
     @card_status == :in_use
   end
 
+  private
+
+  def deduct(fare_amount)
+    journey = Journey.new
+    journey.fare = fare_amount
+    @balance -= journey.fare
+  end
 end

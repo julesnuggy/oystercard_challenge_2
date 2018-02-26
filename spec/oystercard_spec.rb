@@ -31,6 +31,11 @@ require 'oystercard'
         expect { oystercard.touch_in }.not_to raise_error
       end
 
+      it 'should readuce the balance by minimum fare when touch_out' do
+        oystercard.top_up(1)
+        expect { oystercard.touch_out }.to change {oystercard.balance}.by(-1)
+      end
+
     end
 
     describe "check and change card_status" do
@@ -52,6 +57,8 @@ require 'oystercard'
         oystercard.touch_in
         expect(oystercard.in_journey?).to be_truthy
       end
+
+
 
     end
 
