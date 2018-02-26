@@ -1,10 +1,13 @@
 class Oystercard
   DEFAULT_LIMIT = 90
-  attr_reader :balance, :card_status
+  MINIMUM_BALANCE = 1
+  attr_reader :balance, :minimum_balance
+  attr_accessor :card_status
 
-  def initialize(limit = DEFAULT_LIMIT)
+  def initialize(limit = DEFAULT_LIMIT, minimum = MINIMUM_BALANCE)
     @balance = 0
     @limit = limit
+    @minimum_balance = minimum
     @card_status = :not_in_use
   end
 
@@ -20,6 +23,7 @@ class Oystercard
   end
 
   def touch_in
+    raise "Sorry, not enough credit in balance (£#{@balance})" if @balance < @minimum_balance
     @card_status = :in_use if @card_status == :not_in_use
   end
 
@@ -30,5 +34,5 @@ class Oystercard
   def in_journey?
     @card_status == :in_use
   end
-  
+
 end
