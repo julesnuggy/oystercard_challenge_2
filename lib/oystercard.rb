@@ -36,9 +36,7 @@ class Oystercard
   private
 
   def deduct(fare_amount)
-    journey = Journey.new
-    journey.fare = fare_amount
-    @balance -= journey.fare
+    @balance -= fare_amount
   end
 
 end
