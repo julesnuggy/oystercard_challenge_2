@@ -1,5 +1,5 @@
 class Journey
-attr_accessor :fare, :entry_station, :exit_station
+attr_accessor :entry_station, :exit_station
 
 PENALTY_FARE = 6
 MINIMUM_FARE = 1
@@ -15,7 +15,7 @@ MINIMUM_FARE = 1
   end
 
   def complete?
-    @exit_station
+    @exit_station && @entry_station
   end
 
   def fare
