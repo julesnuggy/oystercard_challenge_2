@@ -2,11 +2,14 @@ require 'oystercard'
   describe Oystercard do
     #oystercard = Oystercard.new
     subject(:oystercard) {described_class.new}
+    subject(:oystercard_min) {described_class.new}
     subject(:oystercard_empty) {described_class.new}
     let(:station_dbl) { double(:station_dbl, name: "Paddington") }
+    let(:station_dbl_2) { double(:station_dbl, name: "Waterloo") }
 
     before do
-      oystercard.top_up(1)
+      oystercard.top_up(10)
+      oystercard_min.top_up(1)
     end
 
     describe "check balance and enforce limits" do
@@ -28,12 +31,10 @@ require 'oystercard'
       end
 
       it 'should NOT raise an error when at minimum balance' do
-        oystercard.top_up(1)
-        expect { oystercard.touch_in(station_dbl) }.not_to raise_error
+        expect { oystercard_min.touch_in(station_dbl) }.not_to raise_error
       end
 
       it 'should reduce the balance by minimum fare when touch_out' do
-        oystercard.top_up(1)
         expect { oystercard.touch_out(station_dbl) }.to change {oystercard.balance}.by(-1)
       end
 
@@ -41,7 +42,6 @@ require 'oystercard'
 
     describe "check and change card_status" do
       it "should start the journey when touch in" do
-        oystercard.top_up(1)
         oystercard.touch_in(station_dbl)
         expect(oystercard.in_journey?).to be_truthy
       end
@@ -60,14 +60,32 @@ require 'oystercard'
         oystercard.touch_in(station_dbl)
         expect(oystercard.in_journey?).to be_truthy
       end
+    end
 
     describe 'keep track of journey history' do
       it 'logs the entry station' do
         oystercard.touch_in(station_dbl)
         expect(oystercard.entry_station).to eq "Paddington"
       end
-    end
 
+      it 'logs the exit station' do
+        oystercard.touch_out(station_dbl_2)
+        expect(oystercard.exit_station).to eq "Waterloo"
+      end
+
+      it 'returns a single journey history' do
+        oystercard.touch_in(station_dbl)
+        oystercard.touch_out(station_dbl_2)
+        expect(oystercard.history).to eq [{entry: "Paddington", exit: "Waterloo"}]
+      end
+
+      it 'returns multiple journey history' do
+        oystercard.touch_in(station_dbl)
+        oystercard.touch_out(station_dbl_2)
+        oystercard.touch_in(station_dbl_2)
+        oystercard.touch_out(station_dbl)
+        expect(oystercard.history).to eq [{entry: "Paddington", exit: "Waterloo"}, {entry: "Waterloo", exit: "Paddington"}]
+      end
 
     end
 
