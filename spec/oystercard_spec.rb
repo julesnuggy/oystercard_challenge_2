@@ -73,6 +73,16 @@ require 'oystercard'
         expect(oystercard.exit_station).to eq "Waterloo"
       end
 
+      it 'entry station is nil once you exit station' do
+        oystercard.touch_out(station_dbl_2)
+        expect(oystercard.entry_station).to eq nil
+      end
+
+      it 'starts empty by default' do
+        expect(oystercard.history).to eq []
+      end
+
+
       it 'returns a single journey history' do
         oystercard.touch_in(station_dbl)
         oystercard.touch_out(station_dbl_2)

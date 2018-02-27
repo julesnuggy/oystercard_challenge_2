@@ -8,7 +8,6 @@ class Oystercard
     @limit = limit
     @minimum_fare = minimum
     @history = []
-    @hash = {}
   end
 
   def top_up(amount)
@@ -19,20 +18,19 @@ class Oystercard
   def touch_in(station_object)
     raise "Sorry, not enough credit in balance (£#{@balance})" if @balance < @minimum_fare
     @entry_station = station_object.name
-    @hash[:entry] = @entry_station
   end
 
   def touch_out(station_object)
     deduct(@minimum_fare)
     @exit_station = station_object.name
+    @history << {:entry => @entry_station, :exit => @exit_station}
     @entry_station = nil
-    @hash[:exit] = @exit_station
-    @history.push(@hash)
   end
 
   def in_journey?
     # Return true if @entry_station is NOT nil (i.e. in journey)
     !@entry_station.nil?
+    # Also the same as `!!@entry_station`
   end
 
   private
