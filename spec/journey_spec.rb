@@ -1,57 +1,44 @@
 require 'journey'
-
 describe Journey do
-  subject(:journey) {described_class.new}
-  #let(:oyster_dbl) { double :oyster_dbl }
-  let(:station_dbl) { double :station_dbl }
-  let(:station_dbl_2) { double :station_dbl_2 }
+  let(:station) { double :station, zone: 1}
 
-  before do
-    #allow(oyster_dbl).to receive(:balance) { 10 }
-    #allow(oyster_dbl).to receive(:touch_in) { "Paddington" }
-    #allow(oyster_dbl).to receive(:touch_out) { "Waterloo" }
-    allow(station_dbl).to receive(:name) { }
-    allow(station_dbl_2).to receive(:name) { }
+  it "knows if a journey is not complete" do
+    expect(subject).not_to be_complete
   end
 
-  it 'starts a Journey when you touch in' do
-    expect { journey.start(station_dbl) }.to change { journey.entry_station }.from(nil).to(station_dbl)
+  it 'has a penalty fare by default' do
+    expect(subject.fare).to eq Journey::PENALTY_FARE
   end
 
-  it 'ends a Journey when you touch out' do
-    expect { journey.finish(station_dbl_2) }.to change { journey.exit_station }.from(nil).to(station_dbl_2)
+  it "returns itself when exiting a journey" do
+    expect(subject.finish(station)).to eq(subject)
   end
 
-  it 'knows when you don\'t complete a journey (no touch out)' do
-    journey.start(station_dbl)
-    expect(journey.finished?).to be_falsey
-  end
+  context 'given an entry station' do
+    subject {described_class.new(station)}
 
-  it 'knows when you don\'t complete a journey (no touch in)' do
-    journey.finish(station_dbl_2)
-    expect(journey.finished?).to be_falsey
-  end
+    it 'has an entry station' do
+      expect(subject.entry_station).to eq station
+    end
 
-  it 'knows when you do complete a journey' do
-    journey.start(station_dbl)
-    journey.finish(station_dbl_2)
-    expect(journey.finished?).to be_truthy
-  end
+    it "returns a penalty fare if no exit station given" do
+      expect(subject.fare).to eq Journey::PENALTY_FARE
+    end
 
-  it 'charges a penalty fare by default if you don\'t complete a Journey (no touch out)' do
-    journey.start(station_dbl)
-    expect(journey.fare).to eq Journey::PENALTY_FARE
-  end
+    context 'given an exit station' do
+      let(:other_station) { double :other_station }
 
-  it 'charges a penalty fare by default if you don\'t complete a Journey (no touch in)' do
-    journey.finish(station_dbl_2)
-    expect(journey.fare).to eq Journey::PENALTY_FARE
-  end
+      before do
+        subject.finish(other_station)
+      end
 
-  it 'charges the minimum fare if you do complete a Journey' do
-    journey.start(station_dbl)
-    journey.finish(station_dbl_2)
-    expect(journey.fare).to eq Journey::MINIMUM_FARE
-  end
+      it 'calculates a fare' do
+        expect(subject.fare).to eq Journey::MINIMUM_FARE
+      end
 
+      it "knows if a journey is complete" do
+        expect(subject).to be_complete
+      end
+    end
+  end
 end
