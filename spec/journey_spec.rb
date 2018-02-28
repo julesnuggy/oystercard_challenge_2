@@ -24,6 +24,7 @@ describe Journey do
 
   end
 
+=begin
   it 'should tell us if the journey is complete' do
     journey.start(station_dbl)
     journey.finish(station_dbl_2)
@@ -53,5 +54,5 @@ describe Journey do
     journey.finish(station_dbl_2)
     expect(journey.history).to eq [{entry: station_dbl, exit: station_dbl_2, fare: 1}, {entry: station_dbl, exit: station_dbl_2, fare: 1}]
   end
-
+=end
 end
